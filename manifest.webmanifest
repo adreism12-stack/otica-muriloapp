@@ -1,0 +1,9 @@
+{
+  "name": "Gestão Ótica",
+  "short_name": "Gestão Ótica",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#0f172a",
+  "description": "PWA de gestão: produtos, clientes, vendas, relatórios e backup."
+}

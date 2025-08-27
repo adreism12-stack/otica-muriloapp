@@ -34,7 +34,39 @@ function limparFormCliente(){$('#titulo-cliente').textContent='Novo Cliente';$('
 function carregarClienteNoForm(c){$('#titulo-cliente').textContent='Editar Cliente';$('#cli-id').value=c.id||'';$('#cli-nome').value=c.nome||'';$('#cli-fone').value=c.fone||'';$('#cli-email').value=c.email||'';$('#cli-notas').value=c.notas||'';const link=c.fone?`https://wa.me/${c.fone}`:'#';$('#btn-cli-whats').href=link;$('#btn-cli-whats').style.pointerEvents=c.fone?'auto':'none';}
 $('#btn-cli-novo').onclick=limparFormCliente;$('#btn-cli-excluir').onclick=async()=>{const id=Number($('#cli-id').value||0);if(!id)return alert('Selecione um cliente para excluir.');if(!confirm('Excluir este cliente?'))return;await db.del('clientes',id);limparFormCliente();carregarClientes($('#busca-cli').value||'');};
 $('#form-cliente').addEventListener('submit',async e=>{e.preventDefault();const id=Number($('#cli-id').value||0);const obj={id:id||undefined,nome:$('#cli-nome').value.trim(),fone:($('#cli-fone').value||'').replace(/\D/g,''),email:$('#cli-email').value.trim(),notas:$('#cli-notas').value.trim()};
-if(id)await db.put('clientes',obj);else await db.add('clientes',obj);limparFormCliente();carregarClientes($('#busca-cli').value||'');});
+if(id)await db.put('clientes',obj);else await db.add('clientes',obj);limparFormCliente(){function limparFormCliente(){
+  $('#titulo-cliente').textContent='Novo Cliente';
+  $('#cli-id').value=''; $('#form-cliente').reset();
+  $('#btn-cli-whats').href='#'; $('#btn-cli-whats').style.pointerEvents='none';
+}
+;carregarClientes($('#busca-cli').value||'');});
+function atualizarLinkWhats(){
+ const link = c.fone ? `https://wa.me/${c.fone}` : '#';
+$('#btn-cli-whats').href = link;
+$('#btn-cli-whats').style.pointerEvents = c.fone ? 'auto' : 'none';
+}
+
+async function salvarCliente(){
+  const id = Number($('#cli-id').value||0);
+  const nome = $('#cli-nome').value.trim();
+  const fone = ($('#cli-fone').value||'').replace(/\D/g,'');
+  const email = $('#cli-email').value.trim();
+  const notas = $('#cli-notas').value.trim();
+
+  if(!nome){ alert('Informe o nome do cliente.'); $('#cli-nome').focus(); return; }
+
+  const obj = { id: id||undefined, nome, fone, email, notas };
+  if(id) await db.put('clientes', obj); else await db.add('clientes', obj);
+
+  limparFormCliente();
+  await carregarClientes($('#busca-cli').value||'');
+  alert('Cliente salvo com sucesso!');
+}
+
+// ligar eventos do botão e do campo telefone
+$('#btn-cli-salvar').onclick = salvarCliente;
+$('#cli-fone').addEventListener('input', atualizarLinkWhats);
+
 $('#busca-cli').addEventListener('input',e=>carregarClientes(e.target.value));
 
 // ---- Vendas ----

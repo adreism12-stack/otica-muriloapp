@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gestão Ótica</title>
+  <meta name="theme-color" content="#0f172a">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo-fallback">👓</div>
+      <h1>Gestão Ótica</h1>
+    </div>
+    <nav class="nav">
+      <button data-tab="dashboard">Dashboard</button>
+      <button data-tab="produtos">Produtos</button>
+      <button data-tab="clientes">Clientes</button>
+      <button data-tab="vendas">Vendas</button>
+      <button data-tab="relatorios">Relatórios</button>
+      <button data-tab="backup">Backup</button>
+      <button id="instalar" style="display:none">Instalar</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Dashboard -->
+    <section id="tab-dashboard" class="tab active">
+      <div class="cards">
+        <div class="card"><div class="card-title">Produtos</div><div class="card-value" id="kpi-produtos">0</div></div>
+        <div class="card"><div class="card-title">Clientes</div><div class="card-value" id="kpi-clientes">0</div></div>
+        <div class="card"><div class="card-title">Vendas (Hoje)</div><div class="card-value" id="kpi-vendas-hoje">0</div></div>
+        <div class="card"><div class="card-title">Faturamento (Hoje)</div><div class="card-value" id="kpi-fat-hoje">R$ 0,00</div></div>
+      </div>
+      <h2>Alertas de Estoque Baixo</h2>
+      <table class="table" id="tbl-alertas">
+        <thead><tr><th>SKU</th><th>Produto</th><th>Qtd</th><th>Mín.</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <!-- Produtos -->
+    <section id="tab-produtos" class="tab">
+      <div class="grid-2">
+        <form id="form-produto" class="panel">
+          <h2 id="titulo-produto">Novo Produto</h2>
+          <input type="hidden" id="prod-id">
+          <label>Nome <input id="prod-nome" required></label>
+          <label>SKU <input id="prod-sku"></label>
+          <label>Categoria <input id="prod-categoria" placeholder="Grau / Sol / Lente / Acessório"></label>
+          <label>Preço (R$) <input id="prod-preco" type="number" step="0.01" min="0" required></label>
+          <label>Custo (R$) <input id="prod-custo" type="number" step="0.01" min="0"></label>
+          <label>Quantidade <input id="prod-qtd" type="number" step="1" min="0" required></label>
+          <label>Estoque Mínimo <input id="prod-min" type="number" step="1" min="0" value="0"></label>
+          <label>Foto <input id="prod-foto" type="file" accept="image/*" capture="environment"></label>
+          <div class="actions">
+            <button type="submit">Salvar</button>
+            <button type="button" id="btn-prod-novo" class="secondary">Novo</button>
+            <button type="button" id="btn-prod-excluir" class="danger">Excluir</button>
+          </div>
+        </form>
+
+        <div class="panel">
+          <div class="list-actions">
+            <input id="busca-prod" placeholder="Buscar por nome ou SKU">
+            <button id="btn-exportar-produtos" class="secondary">Exportar CSV</button>
+          </div>
+          <table class="table" id="tbl-produtos">
+            <thead><tr><th>SKU</th><th>Produto</th><th>Categoria</th><th>Preço</th><th>Qtd</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Clientes -->
+    <section id="tab-clientes" class="tab">
+      <div class="grid-2">
+        <form id="form-cliente" class="panel">
+          <h2 id="titulo-cliente">Novo Cliente</h2>
+          <input type="hidden" id="cli-id">
+          <label>Nome <input id="cli-nome" required></label>
+          <label>Telefone/WhatsApp <input id="cli-fone" placeholder="5592999999999"></label>
+          <label>E-mail <input id="cli-email" type="email"></label>
+          <label>Observações <textarea id="cli-notas" rows="3"></textarea></label>
+          <div class="actions">
+            <button type="submit">Salvar</button>
+            <button type="button" id="btn-cli-novo" class="secondary">Novo</button>
+            <button type="button" id="btn-cli-excluir" class="danger">Excluir</button>
+            <a id="btn-cli-whats" class="secondary" target="_blank" rel="noopener">Abrir WhatsApp</a>
+          </div>
+        </form>
+
+        <div class="panel">
+          <div class="list-actions">
+            <input id="busca-cli" placeholder="Buscar cliente">
+          </div>
+          <table class="table" id="tbl-clientes">
+            <thead><tr><th>Nome</th><th>Telefone</th><th>E-mail</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Vendas -->
+    <section id="tab-vendas" class="tab">
+      <div class="grid-2">
+        <form id="form-venda" class="panel">
+          <h2>Nova Venda</h2>
+          <label>Cliente
+            <select id="vnd-cliente"></select>
+          </label>
+          <label>Produto (busca)
+            <input id="vnd-busca-prod" placeholder="Digite nome ou SKU e Enter">
+          </label>
+          <div id="vnd-itens"></div>
+          <div class="totais">
+            <label>Desconto (R$) <input id="vnd-desconto" type="number" step="0.01" min="0" value="0"></label>
+            <div><strong>Total: R$ <span id="vnd-total">0,00</span></strong></div>
+          </div>
+          <label>Pagamento
+            <select id="vnd-pag">
+              <option>Dinheiro</option>
+              <option>Cartão</option>
+              <option>PIX</option>
+            </select>
+          </label>
+          <div class="actions">
+            <button type="submit">Finalizar Venda</button>
+            <button type="button" id="btn-vnd-limpar" class="secondary">Limpar</button>
+          </div>
+        </form>
+
+        <div class="panel">
+          <h2>Vendas Recentes</h2>
+          <table class="table" id="tbl-vendas">
+            <thead><tr><th>Data</th><th>Cliente</th><th>Itens</th><th>Total</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="recibo" class="recibo" style="display:none"></div>
+    </section>
+
+    <!-- Relatórios -->
+    <section id="tab-relatorios" class="tab">
+      <div class="panel">
+        <h2>Relatório de Vendas</h2>
+        <div class="grid-3">
+          <label>Data início <input type="date" id="rep-inicio"></label>
+          <label>Data fim <input type="date" id="rep-fim"></label>
+          <button id="btn-gerar-rel">Gerar</button>
+        </div>
+        <div class="cards">
+          <div class="card"><div class="card-title">Vendas</div><div class="card-value" id="rep-qtd">0</div></div>
+          <div class="card"><div class="card-title">Faturamento</div><div class="card-value" id="rep-fat">R$ 0,00</div></div>
+          <div class="card"><div class="card-title">Ticket Médio</div><div class="card-value" id="rep-ticket">R$ 0,00</div></div>
+        </div>
+        <button id="btn-rel-csv" class="secondary">Exportar CSV</button>
+        <table class="table" id="tbl-rel">
+          <thead><tr><th>Data</th><th>Cliente</th><th>Itens</th><th>Total</th><th>Pagamento</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Backup -->
+    <section id="tab-backup" class="tab">
+      <div class="panel">
+        <h2>Backup</h2>
+        <p>Faça backup dos dados (IndexedDB) para usar em outro dispositivo, ou restaurar.</p>
+        <div class="actions">
+          <button id="btn-exportar">Exportar JSON</button>
+          <label class="btn-file">Importar JSON <input type="file" id="inp-importar" accept="application/json"></label>
+          <button id="btn-reset" class="danger">Limpar Tudo</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <small>© <span id="ano"></span> Gestão Ótica • PWA Offline</small>
+  </footer>
+
+  <script src="db.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
